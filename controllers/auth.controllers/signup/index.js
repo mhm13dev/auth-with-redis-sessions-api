@@ -36,12 +36,12 @@ module.exports = async (req, res, next) => {
 
   const user = {
     _id: new ObjectId(),
-    email,
-    password: bcrypt.hashSync(password, 10),
+    email: email.toLowerCase().trim(),
+    password: await bcrypt.hash(password, 10),
   };
 
   try {
-    const { insertedId: _id } = await UsersCollection.insertOne(user);
+    await UsersCollection.insertOne(user);
 
     return res.status(201).json({
       status: "success",
