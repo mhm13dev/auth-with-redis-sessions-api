@@ -2,6 +2,7 @@ const express = require("express");
 const session = require("express-session");
 const { createClient } = require("redis");
 const RedisStore = require("connect-redis")(session);
+const cors = require("cors");
 
 const apiRouter = require("./routes");
 
@@ -23,6 +24,14 @@ async function initApp() {
 
   const app = express();
 
+  // Cors
+  const corsOptions = {
+    origin: process.env.CORS_ORIGINS.split(","),
+    credentials: true,
+  };
+  app.options(cors(corsOptions));
+  app.use(cors(corsOptions));
+
   if (process.env.NODE_ENV === "production") {
     // For using cookies in production when secure: true and app is behind proxy
     app.set("trust proxy", 1); // trust first proxy
@@ -43,6 +52,7 @@ async function initApp() {
         maxAge:
           Number(process.env.SESSION_COOKIE_MAX_AGE_DAYS) * 24 * 60 * 60 * 1000,
         domain: process.env.COOKIES_DOMAIN,
+        sameSite: "lax",
       },
     })
   );
